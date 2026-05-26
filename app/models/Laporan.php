@@ -194,4 +194,95 @@ class Laporan
 
         return $stmt->fetchAll();
     }
+
+    private function buildAdminReportWhere(array $filters, array &$params)
+    {
+        $conditions = [];
+
+        if (!empty($filters['status'])) {
+            $conditions[] = "laporan.status = :status";
+            $params[':status'] = $filters['status'];
+        }
+
+        if (!empty($filters['keyword'])) {
+            $keyword = '%' . $filters['keyword'] . '%';
+
+            $conditions[] = "(
+            laporan.judul LIKE :keyword_judul
+            OR laporan.deskripsi LIKE :keyword_deskripsi
+            OR laporan.alamat LIKE :keyword_alamat
+            OR users.nama LIKE :keyword_nama
+            OR users.email LIKE :keyword_email
+        )";
+
+            $params[':keyword_judul'] = $keyword;
+            $params[':keyword_deskripsi'] = $keyword;
+            $params[':keyword_alamat'] = $keyword;
+            $params[':keyword_nama'] = $keyword;
+            $params[':keyword_email'] = $keyword;
+        }
+
+        if (!empty($filters['tanggal_mulai'])) {
+            $conditions[] = "laporan.created_at >= :tanggal_mulai";
+            $params[':tanggal_mulai'] = $filters['tanggal_mulai'] . ' 00:00:00';
+        }
+
+        if (!empty($filters['tanggal_selesai'])) {
+            $conditions[] = "laporan.created_at <= :tanggal_selesai";
+            $params[':tanggal_selesai'] = $filters['tanggal_selesai'] . ' 23:59:59';
+        }
+
+        if (count($conditions) === 0) {
+            return '';
+        }
+
+        return 'WHERE ' . implode(' AND ', $conditions);
+    }
+
+    public function searchAdminReports(array $filters = [], $limit = 10, $offset = 0)
+    {
+        $params = [];
+        $where = $this->buildAdminReportWhere($filters, $params);
+
+        $query = "SELECT laporan.*, users.nama, users.email
+              FROM laporan
+              JOIN users ON users.id_user = laporan.id_user
+              $where
+              ORDER BY laporan.created_at DESC
+              LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->pdo->prepare($query);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    public function countAdminReports(array $filters = [])
+    {
+        $params = [];
+        $where = $this->buildAdminReportWhere($filters, $params);
+
+        $query = "SELECT COUNT(*) AS total
+              FROM laporan
+              JOIN users ON users.id_user = laporan.id_user
+              $where";
+
+        $stmt = $this->pdo->prepare($query);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->execute();
+
+        return (int) $stmt->fetch()['total'];
+    }
 }

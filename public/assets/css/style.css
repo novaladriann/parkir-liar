@@ -638,3 +638,29 @@ body {
         width: 100%;
     }
 }
+
+.table-thumb {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+    background: #e5e7eb;
+}
+
+.pagination .page-link {
+    border-radius: 10px;
+    margin: 0 3px;
+    border-color: var(--border-color);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #94a3b8;
+}
