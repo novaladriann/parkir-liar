@@ -290,3 +290,80 @@ body {
         height: 260px;
     }
 }
+
+.map-preview {
+    width: 100%;
+    height: 340px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: #e5e7eb;
+}
+
+.map-detail {
+    width: 100%;
+    height: 320px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: #e5e7eb;
+}
+
+.status-badge {
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.status-menunggu {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-diverifikasi {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status-diproses {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.status-selesai {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-ditolak {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.table-modern {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.table-modern tbody tr {
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
+}
+
+.table-modern tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table-modern tbody td:first-child {
+    border-left: 1px solid var(--border-color);
+    border-radius: 16px 0 0 16px;
+}
+
+.table-modern tbody td:last-child {
+    border-right: 1px solid var(--border-color);
+    border-radius: 0 16px 16px 0;
+}

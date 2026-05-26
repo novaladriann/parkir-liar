@@ -96,7 +96,7 @@ $error = get_flash('error');
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Kelola Laporan</h5>
                         <p class="text-muted">Verifikasi dan ubah status laporan masyarakat.</p>
-                        <a href="#" class="btn btn-outline-primary">Buka</a>
+                        <a href="<?= url('admin/laporan.php'); ?>" class="btn btn-outline-primary">Buka</a>
                     </div>
                 </div>
             </div>

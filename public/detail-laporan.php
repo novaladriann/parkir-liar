@@ -51,10 +51,7 @@ require_once __DIR__ . '/layouts/header.php';
             <div class="col-lg-7">
                 <div class="card shadow-sm">
                     <div class="report-detail-image">
-                        <img 
-                            src="<?= url('assets/uploads/laporan/' . $laporan['foto']); ?>" 
-                            alt="Foto laporan"
-                        >
+                        <img src="<?= url('assets/uploads/laporan/' . $laporan['foto']); ?>" alt="Foto laporan">
                     </div>
 
                     <div class="card-body p-4">
@@ -107,12 +104,9 @@ require_once __DIR__ . '/layouts/header.php';
                                 <strong><?= e($laporan['alamat'] ?: '-'); ?></strong>
                             </div>
                         </div>
-
-                        <a 
-                            href="https://www.google.com/maps?q=<?= e($laporan['latitude']); ?>,<?= e($laporan['longitude']); ?>" 
-                            target="_blank"
-                            class="btn btn-primary w-100 mt-4"
-                        >
+                        <div id="detailMap" class="map-detail mt-4"></div>
+                        <a href="https://www.google.com/maps?q=<?= e($laporan['latitude']); ?>,<?= e($laporan['longitude']); ?>"
+                            target="_blank" class="btn btn-primary w-100 mt-4">
                             Buka di Google Maps
                         </a>
                     </div>
@@ -121,5 +115,23 @@ require_once __DIR__ . '/layouts/header.php';
         </div>
     </div>
 </section>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const lat = <?= json_encode((float) $laporan['latitude']); ?>;
+        const lng = <?= json_encode((float) $laporan['longitude']); ?>;
+
+        const map = L.map('detailMap').setView([lat, lng], 17);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup('Lokasi laporan parkir liar')
+            .openPopup();
+    });
+</script>
 
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>

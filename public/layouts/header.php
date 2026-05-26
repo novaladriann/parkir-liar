@@ -15,6 +15,9 @@ $user = current_user();
     <title><?= APP_NAME; ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <link href="<?= url('assets/css/style.css'); ?>" rel="stylesheet">
 </head>
 
@@ -51,6 +54,12 @@ $user = current_user();
 
                             <li class="nav-item">
                                 <a class="nav-link" href="<?= url('riwayat-laporan.php'); ?>">Riwayat</a>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php if ($user['role'] === 'admin'): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= url('admin/laporan.php'); ?>">Kelola Laporan</a>
                             </li>
                         <?php endif; ?>
 
