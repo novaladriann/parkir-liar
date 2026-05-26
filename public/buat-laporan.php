@@ -75,11 +75,28 @@ $success = get_flash('success');
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Foto Kendaraan / Lokasi</label>
+
+                                <div class="upload-preview-box mb-3">
+                                    <div class="upload-preview-image" id="uploadPreviewImage">
+                                        <span>Preview foto akan tampil di sini</span>
+                                    </div>
+
+                                    <div class="upload-preview-info">
+                                        <strong id="uploadFileName">Belum ada foto dipilih</strong>
+                                        <p id="uploadFileInfo" class="text-muted mb-0">
+                                            Format JPG, PNG, atau WEBP. Maksimal 2MB.
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <input type="file" name="foto" id="foto" class="form-control"
                                     accept="image/jpeg,image/png,image/webp" required>
+
                                 <small class="text-muted">
-                                    Format: JPG, PNG, WEBP. Maksimal 2MB.
+                                    Pastikan foto jelas, tidak blur, dan menunjukkan kendaraan atau lokasi parkir liar.
                                 </small>
+
+                                <div class="invalid-feedback d-block mt-2" id="fotoError"></div>
                             </div>
 
                             <div class="mb-4">
@@ -111,7 +128,7 @@ $success = get_flash('success');
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <button type="submit" id="submitLaporanBtn" class="btn btn-primary btn-lg w-100">
                                 Kirim Laporan
                             </button>
                         </form>
@@ -179,6 +196,19 @@ $success = get_flash('success');
             document.getElementById('gpsStatus').textContent = 'Lokasi dipilih manual dari peta';
             document.getElementById('gpsInfo').textContent = 'Marker digeser secara manual oleh pelapor.';
         });
+
+        reportMap.on('click', function (event) {
+            const lat = event.latlng.lat;
+            const lng = event.latlng.lng;
+
+            document.getElementById('latitude').value = lat.toFixed(8);
+            document.getElementById('longitude').value = lng.toFixed(8);
+
+            updateMap(lat, lng, 'Lokasi dipilih dari klik pada peta.');
+
+            document.getElementById('gpsStatus').textContent = 'Lokasi dipilih dari peta';
+            document.getElementById('gpsInfo').textContent = 'Pelapor memilih titik lokasi secara manual pada peta.';
+        });
     }
 
     function updateMap(lat, lng, popupText = 'Lokasi laporan terdeteksi.') {
@@ -243,9 +273,186 @@ $success = get_flash('success');
         );
     }
 
+    const maxUploadSize = 2 * 1024 * 1024;
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+    function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function showFotoError(message) {
+        document.getElementById('fotoError').textContent = message;
+    }
+
+    function clearFotoError() {
+        document.getElementById('fotoError').textContent = '';
+    }
+
+    function resetFotoPreview() {
+        const preview = document.getElementById('uploadPreviewImage');
+        const fileName = document.getElementById('uploadFileName');
+        const fileInfo = document.getElementById('uploadFileInfo');
+
+        preview.innerHTML = '<span>Preview foto akan tampil di sini</span>';
+        fileName.textContent = 'Belum ada foto dipilih';
+        fileInfo.textContent = 'Format JPG, PNG, atau WEBP. Maksimal 2MB.';
+    }
+
+    function setFotoPreview(file) {
+        const preview = document.getElementById('uploadPreviewImage');
+        const fileName = document.getElementById('uploadFileName');
+        const fileInfo = document.getElementById('uploadFileInfo');
+
+        const imageUrl = URL.createObjectURL(file);
+
+        preview.innerHTML = `<img src="${imageUrl}" alt="Preview foto laporan">`;
+        fileName.textContent = file.name;
+        fileInfo.textContent = `${file.type} • ${formatBytes(file.size)}`;
+    }
+
+    function compressImage(file, quality = 0.82, maxWidth = 1600) {
+        return new Promise(function (resolve, reject) {
+            const image = new Image();
+            const objectUrl = URL.createObjectURL(file);
+
+            image.onload = function () {
+                URL.revokeObjectURL(objectUrl);
+
+                let width = image.width;
+                let height = image.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0, width, height);
+
+                canvas.toBlob(
+                    function (blob) {
+                        if (!blob) {
+                            reject(new Error('Gagal mengompres gambar.'));
+                            return;
+                        }
+
+                        const compressedFile = new File(
+                            [blob],
+                            file.name.replace(/\.[^/.]+$/, '') + '.jpg',
+                            { type: 'image/jpeg' }
+                        );
+
+                        resolve(compressedFile);
+                    },
+                    'image/jpeg',
+                    quality
+                );
+            };
+
+            image.onerror = function () {
+                URL.revokeObjectURL(objectUrl);
+                reject(new Error('File gambar tidak valid.'));
+            };
+
+            image.src = objectUrl;
+        });
+    }
+
+    async function handleFotoChange(event) {
+        const input = event.target;
+        const file = input.files[0];
+
+        clearFotoError();
+
+        if (!file) {
+            resetFotoPreview();
+            return;
+        }
+
+        if (!allowedMimeTypes.includes(file.type)) {
+            input.value = '';
+            resetFotoPreview();
+            showFotoError('Format foto tidak valid. Gunakan JPG, PNG, atau WEBP.');
+            return;
+        }
+
+        let finalFile = file;
+
+        try {
+            if (file.size > maxUploadSize) {
+                const compressedFile = await compressImage(file);
+
+                if (compressedFile.size <= maxUploadSize && window.DataTransfer) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(compressedFile);
+                    input.files = dataTransfer.files;
+                    finalFile = compressedFile;
+                } else {
+                    input.value = '';
+                    resetFotoPreview();
+                    showFotoError('Ukuran foto masih terlalu besar. Gunakan foto maksimal 2MB.');
+                    return;
+                }
+            }
+
+            setFotoPreview(finalFile);
+        } catch (error) {
+            input.value = '';
+            resetFotoPreview();
+            showFotoError('Foto gagal diproses. Coba gunakan foto lain.');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         initMap();
         getLocation();
+
+        const fotoInput = document.getElementById('foto');
+        const form = document.querySelector('form');
+        const submitBtn = document.getElementById('submitLaporanBtn');
+
+        fotoInput.addEventListener('change', handleFotoChange);
+
+        form.addEventListener('submit', function (event) {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+            const foto = fotoInput.files[0];
+
+            clearFotoError();
+
+            if (!latitude || !longitude) {
+                event.preventDefault();
+                alert('Lokasi GPS belum terisi. Ambil GPS atau geser marker pada peta terlebih dahulu.');
+                return;
+            }
+
+            if (!foto) {
+                event.preventDefault();
+                showFotoError('Foto bukti wajib diunggah.');
+                return;
+            }
+
+            if (!allowedMimeTypes.includes(foto.type)) {
+                event.preventDefault();
+                showFotoError('Format foto tidak valid.');
+                return;
+            }
+
+            if (foto.size > maxUploadSize) {
+                event.preventDefault();
+                showFotoError('Ukuran foto maksimal 2MB.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mengirim laporan...';
+        });
     });
 </script>
 

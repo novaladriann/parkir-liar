@@ -4,6 +4,15 @@ require_once __DIR__ . '/../../app/helpers/url.php';
 require_once __DIR__ . '/../../app/helpers/session.php';
 
 $user = current_user();
+$unreadNotificationCount = 0;
+
+if ($user && $user['role'] === 'masyarakat') {
+    require_once __DIR__ . '/../../app/config/database.php';
+    require_once __DIR__ . '/../../app/models/Notification.php';
+
+    $notificationModel = new Notification($pdo);
+    $unreadNotificationCount = $notificationModel->countUnreadByUser($user['id_user']);
+}
 ?>
 
 <!doctype html>
@@ -57,6 +66,17 @@ $user = current_user();
 
                             <li class="nav-item">
                                 <a class="nav-link" href="<?= url('riwayat-laporan.php'); ?>">Riwayat</a>
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="<?= url('notifikasi.php'); ?>">
+                                    Notifikasi
+
+                                    <?php if ($unreadNotificationCount > 0): ?>
+                                        <span class="notification-badge">
+                                            <?= $unreadNotificationCount > 9 ? '9+' : $unreadNotificationCount; ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
                             </li>
                         <?php endif; ?>
 
@@ -73,11 +93,11 @@ $user = current_user();
                                 <a class="nav-link" href="<?= url('admin/grafik.php'); ?>">Grafik</a>
                             </li>
                         <?php endif; ?>
-
+                        
                         <li class="nav-item">
-                            <span class="nav-link text-muted">
+                            <a class="nav-link fw-semibold" href="<?= url('profil.php'); ?>">
                                 <?= e($user['nama']); ?>
-                            </span>
+                            </a>
                         </li>
 
                         <li class="nav-item">

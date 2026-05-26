@@ -6,6 +6,7 @@ require_once __DIR__ . '/../models/Laporan.php';
 require_once __DIR__ . '/../helpers/session.php';
 require_once __DIR__ . '/../helpers/url.php';
 require_once __DIR__ . '/../helpers/csrf.php';
+require_once __DIR__ . '/../models/Notification.php';
 
 class AdminController
 {
@@ -75,15 +76,37 @@ class AdminController
         $user = current_user();
 
         if ($statusSebelum !== $status || $catatanSebelumnya !== $catatanAdmin) {
+            $catatanLog = $catatanAdmin !== ''
+                ? $catatanAdmin
+                : 'Status laporan diperbarui oleh admin.';
+
             $laporanModel->addStatusLog(
                 $idLaporan,
                 $statusSebelum,
                 $status,
-                $catatanAdmin !== '' ? $catatanAdmin : 'Status laporan diperbarui oleh admin.',
+                $catatanLog,
                 $user['id_user']
             );
-        }
 
+            if ($statusSebelum !== $status) {
+                $notificationModel = new Notification($pdo);
+
+                $judulNotifikasi = 'Status laporan diperbarui';
+                $pesanNotifikasi = 'Laporan "' . $laporan['judul'] . '" berubah dari ' .
+                    ucfirst($statusSebelum) . ' menjadi ' . ucfirst($status) . '.';
+
+                if ($catatanAdmin !== '') {
+                    $pesanNotifikasi .= ' Catatan admin: ' . $catatanAdmin;
+                }
+
+                $notificationModel->create(
+                    $laporan['id_user'],
+                    $idLaporan,
+                    $judulNotifikasi,
+                    $pesanNotifikasi
+                );
+            }
+        }
         set_flash('success', 'Status laporan berhasil diperbarui.');
         header('Location: ' . url('admin/detail-laporan.php?id=' . $idLaporan));
         exit;

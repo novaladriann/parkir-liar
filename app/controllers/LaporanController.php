@@ -102,6 +102,29 @@ class LaporanController
             exit;
         }
 
+        $imageInfo = getimagesize($foto['tmp_name']);
+
+        if ($imageInfo === false) {
+            set_flash('error', 'File yang diunggah bukan gambar valid.');
+            header('Location: ' . url('buat-laporan.php'));
+            exit;
+        }
+
+        $imageWidth = $imageInfo[0];
+        $imageHeight = $imageInfo[1];
+
+        if ($imageWidth < 300 || $imageHeight < 300) {
+            set_flash('error', 'Resolusi foto terlalu kecil. Gunakan foto minimal 300x300 piksel.');
+            header('Location: ' . url('buat-laporan.php'));
+            exit;
+        }
+
+        if ($imageWidth > 6000 || $imageHeight > 6000) {
+            set_flash('error', 'Resolusi foto terlalu besar. Gunakan foto dengan ukuran lebih wajar.');
+            header('Location: ' . url('buat-laporan.php'));
+            exit;
+        }
+
         $extension = $allowedTypes[$mimeType];
         $fileName = 'laporan_' . date('YmdHis') . '_' . bin2hex(random_bytes(8)) . '.' . $extension;
 
