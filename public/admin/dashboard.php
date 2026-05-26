@@ -72,16 +72,22 @@ $error = get_flash('error');
                 <p class="text-primary fw-semibold mb-1">Dashboard Admin</p>
                 <h2 class="fw-bold mb-2">Pusat Monitoring Parkir Liar</h2>
                 <p class="text-muted mb-0">
-                    Pantau laporan masyarakat, titik pelanggaran, status penanganan, dan statistik pelaporan dalam satu halaman.
+                    Pantau laporan masyarakat, titik pelanggaran, status penanganan, dan statistik pelaporan dalam satu
+                    halaman.
                 </p>
             </div>
 
-            <div class="d-flex gap-2 mt-3 mt-lg-0">
+            <div class="d-flex gap-2 flex-wrap mt-3 mt-lg-0">
                 <a href="<?= url('admin/laporan.php'); ?>" class="btn btn-primary">
                     Kelola Laporan
                 </a>
+
                 <a href="<?= url('admin/peta.php'); ?>" class="btn btn-outline-primary">
                     Lihat Peta
+                </a>
+
+                <a href="<?= url('admin/cetak-laporan.php'); ?>" target="_blank" class="btn btn-outline-primary">
+                    Cetak Rekap
                 </a>
             </div>
         </div>
@@ -169,10 +175,7 @@ $error = get_flash('error');
                             </div>
 
                             <div class="progress modern-progress">
-                                <div 
-                                    class="progress-bar" 
-                                    style="width: <?= $completionRate; ?>%"
-                                ></div>
+                                <div class="progress-bar" style="width: <?= $completionRate; ?>%"></div>
                             </div>
 
                             <small class="text-muted d-block mt-2">
@@ -256,17 +259,16 @@ $error = get_flash('error');
                                         <div>
                                             <strong><?= e($laporan['judul']); ?></strong>
                                             <p class="text-muted mb-1">
-                                                <?= e($laporan['nama']); ?> • <?= date('d M Y H:i', strtotime($laporan['created_at'])); ?>
+                                                <?= e($laporan['nama']); ?> •
+                                                <?= date('d M Y H:i', strtotime($laporan['created_at'])); ?>
                                             </p>
                                             <span class="<?= dashboard_badge_status($laporan['status']); ?>">
                                                 <?= e(ucfirst($laporan['status'])); ?>
                                             </span>
                                         </div>
 
-                                        <a 
-                                            href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>" 
-                                            class="btn btn-outline-primary btn-sm"
-                                        >
+                                        <a href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>"
+                                            class="btn btn-outline-primary btn-sm">
                                             Detail
                                         </a>
                                     </div>
@@ -303,13 +305,12 @@ $error = get_flash('error');
                         <?php else: ?>
                             <div class="pending-list">
                                 <?php foreach ($pendingReports as $laporan): ?>
-                                    <a 
-                                        href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>" 
-                                        class="pending-item"
-                                    >
+                                    <a href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>"
+                                        class="pending-item">
                                         <div>
                                             <strong><?= e($laporan['judul']); ?></strong>
-                                            <span><?= e($laporan['nama']); ?> • <?= date('d M Y', strtotime($laporan['created_at'])); ?></span>
+                                            <span><?= e($laporan['nama']); ?> •
+                                                <?= date('d M Y', strtotime($laporan['created_at'])); ?></span>
                                         </div>
                                         <span>›</span>
                                     </a>

@@ -142,11 +142,8 @@ function render_laporan_admin_content($laporanList, $totalData, $page, $totalPag
                             <?php foreach ($laporanList as $laporan): ?>
                                 <tr>
                                     <td>
-                                        <img
-                                            src="<?= url('assets/uploads/laporan/' . $laporan['foto']); ?>"
-                                            alt="Foto laporan"
-                                            class="table-thumb"
-                                        >
+                                        <img src="<?= url('assets/uploads/laporan/' . $laporan['foto']); ?>" alt="Foto laporan"
+                                            class="table-thumb">
                                     </td>
 
                                     <td>
@@ -182,10 +179,8 @@ function render_laporan_admin_content($laporanList, $totalData, $page, $totalPag
                                     </td>
 
                                     <td class="text-end">
-                                        <a
-                                            href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>"
-                                            class="btn btn-outline-primary btn-sm"
-                                        >
+                                        <a href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>"
+                                            class="btn btn-outline-primary btn-sm">
                                             Detail
                                         </a>
                                     </td>
@@ -199,11 +194,8 @@ function render_laporan_admin_content($laporanList, $totalData, $page, $totalPag
                     <nav class="mt-4">
                         <ul class="pagination justify-content-center mb-0">
                             <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
-                                <a
-                                    class="page-link ajax-page-link"
-                                    href="<?= build_admin_laporan_page_url($page - 1); ?>"
-                                    data-page="<?= $page - 1; ?>"
-                                >
+                                <a class="page-link ajax-page-link" href="<?= build_admin_laporan_page_url($page - 1); ?>"
+                                    data-page="<?= $page - 1; ?>">
                                     Sebelumnya
                                 </a>
                             </li>
@@ -215,11 +207,7 @@ function render_laporan_admin_content($laporanList, $totalData, $page, $totalPag
 
                             <?php if ($startPage > 1): ?>
                                 <li class="page-item">
-                                    <a
-                                        class="page-link ajax-page-link"
-                                        href="<?= build_admin_laporan_page_url(1); ?>"
-                                        data-page="1"
-                                    >
+                                    <a class="page-link ajax-page-link" href="<?= build_admin_laporan_page_url(1); ?>" data-page="1">
                                         1
                                     </a>
                                 </li>
@@ -233,11 +221,8 @@ function render_laporan_admin_content($laporanList, $totalData, $page, $totalPag
 
                             <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                                 <li class="page-item <?= $i === $page ? 'active' : ''; ?>">
-                                    <a
-                                        class="page-link ajax-page-link"
-                                        href="<?= build_admin_laporan_page_url($i); ?>"
-                                        data-page="<?= $i; ?>"
-                                    >
+                                    <a class="page-link ajax-page-link" href="<?= build_admin_laporan_page_url($i); ?>"
+                                        data-page="<?= $i; ?>">
                                         <?= $i; ?>
                                     </a>
                                 </li>
@@ -251,22 +236,16 @@ function render_laporan_admin_content($laporanList, $totalData, $page, $totalPag
                                 <?php endif; ?>
 
                                 <li class="page-item">
-                                    <a
-                                        class="page-link ajax-page-link"
-                                        href="<?= build_admin_laporan_page_url($totalPages); ?>"
-                                        data-page="<?= $totalPages; ?>"
-                                    >
+                                    <a class="page-link ajax-page-link" href="<?= build_admin_laporan_page_url($totalPages); ?>"
+                                        data-page="<?= $totalPages; ?>">
                                         <?= $totalPages; ?>
                                     </a>
                                 </li>
                             <?php endif; ?>
 
                             <li class="page-item <?= $page >= $totalPages ? 'disabled' : ''; ?>">
-                                <a
-                                    class="page-link ajax-page-link"
-                                    href="<?= build_admin_laporan_page_url($page + 1); ?>"
-                                    data-page="<?= $page + 1; ?>"
-                                >
+                                <a class="page-link ajax-page-link" href="<?= build_admin_laporan_page_url($page + 1); ?>"
+                                    data-page="<?= $page + 1; ?>">
                                     Berikutnya
                                 </a>
                             </li>
@@ -307,13 +286,22 @@ $error = get_flash('error');
                 </p>
             </div>
 
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap">
                 <a href="<?= url('admin/dashboard.php'); ?>" class="btn btn-outline-primary">
                     Dashboard
                 </a>
 
-                <a href="<?= url('admin/peta.php'); ?>" class="btn btn-primary">
+                <a href="<?= url('admin/peta.php'); ?>" class="btn btn-outline-primary">
                     Peta
+                </a>
+
+                <a href="<?= url('admin/export-laporan.php'); ?>" id="exportLaporanBtn" class="btn btn-success">
+                    Export Excel
+                </a>
+
+                <a href="<?= url('admin/cetak-laporan.php'); ?>" id="cetakLaporanBtn" class="btn btn-primary"
+                    target="_blank">
+                    Cetak
                 </a>
             </div>
         </div>
@@ -331,14 +319,8 @@ $error = get_flash('error');
                 <form method="GET" id="filterLaporanForm" class="row g-3 align-items-end">
                     <div class="col-lg-4">
                         <label class="form-label fw-semibold">Pencarian</label>
-                        <input
-                            type="text"
-                            name="keyword"
-                            id="keywordInput"
-                            class="form-control"
-                            value="<?= e($keyword); ?>"
-                            placeholder="Cari judul, pelapor, email, alamat..."
-                        >
+                        <input type="text" name="keyword" id="keywordInput" class="form-control"
+                            value="<?= e($keyword); ?>" placeholder="Cari judul, pelapor, email, alamat...">
                     </div>
 
                     <div class="col-lg-2">
@@ -356,24 +338,14 @@ $error = get_flash('error');
 
                     <div class="col-lg-2">
                         <label class="form-label fw-semibold">Tanggal Mulai</label>
-                        <input
-                            type="date"
-                            name="tanggal_mulai"
-                            id="tanggalMulaiInput"
-                            class="form-control"
-                            value="<?= e($tanggalMulai); ?>"
-                        >
+                        <input type="date" name="tanggal_mulai" id="tanggalMulaiInput" class="form-control"
+                            value="<?= e($tanggalMulai); ?>">
                     </div>
 
                     <div class="col-lg-2">
                         <label class="form-label fw-semibold">Tanggal Selesai</label>
-                        <input
-                            type="date"
-                            name="tanggal_selesai"
-                            id="tanggalSelesaiInput"
-                            class="form-control"
-                            value="<?= e($tanggalSelesai); ?>"
-                        >
+                        <input type="date" name="tanggal_selesai" id="tanggalSelesaiInput" class="form-control"
+                            value="<?= e($tanggalSelesai); ?>">
                     </div>
 
                     <div class="col-lg-2">
@@ -409,8 +381,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('laporanLoader');
     const resetBtn = document.getElementById('resetFilterBtn');
     const keywordInput = document.getElementById('keywordInput');
+    const exportBtn = document.getElementById('exportLaporanBtn');
+    const cetakBtn = document.getElementById('cetakLaporanBtn');
 
     let searchTimer = null;
+    updateActionButtons();
 
     function cleanParams(params) {
         for (const [key, value] of [...params.entries()]) {
@@ -438,6 +413,21 @@ document.addEventListener('DOMContentLoaded', function() {
         return window.location.pathname + (query ? '?' + query : '');
     }
 
+        function buildActionUrl(path) {
+            const params = new URLSearchParams(new FormData(form));
+
+            cleanParams(params);
+
+            const query = params.toString();
+
+            return path + (query ? '?' + query : '');
+        }
+
+        function updateActionButtons() {
+            exportBtn.href = buildActionUrl('<?= url('admin/export-laporan.php'); ?>');
+            cetakBtn.href = buildActionUrl('<?= url('admin/cetak-laporan.php'); ?>');
+        }
+
     async function loadReports(page = 1, pushState = true) {
         try {
             loader.classList.remove('d-none');
@@ -463,6 +453,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (pushState) {
                 window.history.pushState({ page: page }, '', cleanUrl);
             }
+
+            updateActionButtons();
+
+
         } catch (error) {
             content.innerHTML = `
                 <div class="alert alert-danger">
