@@ -22,6 +22,21 @@ function is_valid_date_input($date)
     return preg_match('/^\d{4}-\d{2}-\d{2}$/', $date);
 }
 
+function badge_status($status)
+{
+    return 'status-badge status-' . $status;
+}
+
+function build_admin_laporan_page_url($pageNumber)
+{
+    $params = $_GET;
+    unset($params['ajax']);
+
+    $params['page'] = $pageNumber;
+
+    return url('admin/laporan.php?' . http_build_query($params));
+}
+
 $statusFilter = $_GET['status'] ?? '';
 $keyword = trim($_GET['keyword'] ?? '');
 $tanggalMulai = $_GET['tanggal_mulai'] ?? '';
@@ -54,7 +69,9 @@ $filters = [
 
 $laporanModel = new Laporan($pdo);
 
+// Untuk testing boleh 3. Untuk normal biasanya 10.
 $perPage = 3;
+
 $totalData = $laporanModel->countAdminReports($filters);
 $totalPages = max(1, (int) ceil($totalData / $perPage));
 
@@ -74,28 +91,208 @@ $offset = ($page - 1) * $perPage;
 
 $laporanList = $laporanModel->searchAdminReports($filters, $perPage, $offset);
 
+function render_laporan_admin_content($laporanList, $totalData, $page, $totalPages)
+{
+    ob_start();
+    ?>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 laporan-summary">
+        <p class="text-muted mb-0">
+            Menampilkan
+            <strong><?= count($laporanList); ?></strong>
+            dari
+            <strong><?= $totalData; ?></strong>
+            laporan
+        </p>
+
+        <p class="text-muted mb-0">
+            Halaman <strong><?= $page; ?></strong> dari <strong><?= $totalPages; ?></strong>
+        </p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <?php if (count($laporanList) === 0): ?>
+                <div class="text-center p-5">
+                    <h5 class="fw-bold">Data Tidak Ditemukan</h5>
+                    <p class="text-muted mb-3">
+                        Tidak ada laporan yang cocok dengan filter yang dipilih.
+                    </p>
+
+                    <a href="<?= url('admin/laporan.php'); ?>" class="btn btn-primary">
+                        Tampilkan Semua Laporan
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Foto</th>
+                                <th>Pelapor</th>
+                                <th>Laporan</th>
+                                <th>Lokasi</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                                <th class="text-end">Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <?php foreach ($laporanList as $laporan): ?>
+                                <tr>
+                                    <td>
+                                        <img
+                                            src="<?= url('assets/uploads/laporan/' . $laporan['foto']); ?>"
+                                            alt="Foto laporan"
+                                            class="table-thumb"
+                                        >
+                                    </td>
+
+                                    <td>
+                                        <strong><?= e($laporan['nama']); ?></strong><br>
+                                        <small class="text-muted"><?= e($laporan['email']); ?></small>
+                                    </td>
+
+                                    <td>
+                                        <strong><?= e($laporan['judul']); ?></strong><br>
+                                        <small class="text-muted">
+                                            <?= e(mb_strimwidth($laporan['deskripsi'], 0, 80, '...')); ?>
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <small class="text-muted">
+                                            <?= e($laporan['alamat'] ?: 'Tanpa alamat tambahan'); ?><br>
+                                            <?= e($laporan['latitude']); ?>, <?= e($laporan['longitude']); ?>
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        <span class="<?= badge_status($laporan['status']); ?>">
+                                            <?= e(ucfirst($laporan['status'])); ?>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <?= date('d M Y', strtotime($laporan['created_at'])); ?><br>
+                                        <small class="text-muted">
+                                            <?= date('H:i', strtotime($laporan['created_at'])); ?>
+                                        </small>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a
+                                            href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>"
+                                            class="btn btn-outline-primary btn-sm"
+                                        >
+                                            Detail
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <?php if ($totalPages > 1): ?>
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
+                                <a
+                                    class="page-link ajax-page-link"
+                                    href="<?= build_admin_laporan_page_url($page - 1); ?>"
+                                    data-page="<?= $page - 1; ?>"
+                                >
+                                    Sebelumnya
+                                </a>
+                            </li>
+
+                            <?php
+                            $startPage = max(1, $page - 2);
+                            $endPage = min($totalPages, $page + 2);
+                            ?>
+
+                            <?php if ($startPage > 1): ?>
+                                <li class="page-item">
+                                    <a
+                                        class="page-link ajax-page-link"
+                                        href="<?= build_admin_laporan_page_url(1); ?>"
+                                        data-page="1"
+                                    >
+                                        1
+                                    </a>
+                                </li>
+
+                                <?php if ($startPage > 2): ?>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
+                            <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                                <li class="page-item <?= $i === $page ? 'active' : ''; ?>">
+                                    <a
+                                        class="page-link ajax-page-link"
+                                        href="<?= build_admin_laporan_page_url($i); ?>"
+                                        data-page="<?= $i; ?>"
+                                    >
+                                        <?= $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <?php if ($endPage < $totalPages): ?>
+                                <?php if ($endPage < $totalPages - 1): ?>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                <?php endif; ?>
+
+                                <li class="page-item">
+                                    <a
+                                        class="page-link ajax-page-link"
+                                        href="<?= build_admin_laporan_page_url($totalPages); ?>"
+                                        data-page="<?= $totalPages; ?>"
+                                    >
+                                        <?= $totalPages; ?>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
+                            <li class="page-item <?= $page >= $totalPages ? 'disabled' : ''; ?>">
+                                <a
+                                    class="page-link ajax-page-link"
+                                    href="<?= build_admin_laporan_page_url($page + 1); ?>"
+                                    data-page="<?= $page + 1; ?>"
+                                >
+                                    Berikutnya
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php
+
+    return ob_get_clean();
+}
+
+$contentHtml = render_laporan_admin_content($laporanList, $totalData, $page, $totalPages);
+
+if (isset($_GET['ajax']) && $_GET['ajax'] === '1') {
+    echo $contentHtml;
+    exit;
+}
+
 require_once __DIR__ . '/../layouts/header.php';
 
 $success = get_flash('success');
 $error = get_flash('error');
-
-function badge_status($status)
-{
-    return 'status-badge status-' . $status;
-}
-
-function build_admin_laporan_page_url($pageNumber)
-{
-    $params = $_GET;
-    $params['page'] = $pageNumber;
-
-    return url('admin/laporan.php?' . http_build_query($params));
-}
-
-function build_reset_filter_url()
-{
-    return url('admin/laporan.php');
-}
 
 ?>
 
@@ -106,7 +303,7 @@ function build_reset_filter_url()
                 <p class="text-primary fw-semibold mb-1">Admin Panel</p>
                 <h2 class="fw-bold mb-2">Kelola Laporan Parkir Liar</h2>
                 <p class="text-muted mb-0">
-                    Cari, filter, verifikasi, dan pantau laporan masyarakat secara terstruktur.
+                    Cari, filter, verifikasi, dan pantau laporan masyarakat tanpa reload halaman.
                 </p>
             </div>
 
@@ -131,12 +328,13 @@ function build_reset_filter_url()
 
         <div class="card shadow-sm mb-4">
             <div class="card-body p-4">
-                <form method="GET" class="row g-3 align-items-end">
+                <form method="GET" id="filterLaporanForm" class="row g-3 align-items-end">
                     <div class="col-lg-4">
                         <label class="form-label fw-semibold">Pencarian</label>
-                        <input 
-                            type="text" 
-                            name="keyword" 
+                        <input
+                            type="text"
+                            name="keyword"
+                            id="keywordInput"
                             class="form-control"
                             value="<?= e($keyword); ?>"
                             placeholder="Cari judul, pelapor, email, alamat..."
@@ -145,7 +343,7 @@ function build_reset_filter_url()
 
                     <div class="col-lg-2">
                         <label class="form-label fw-semibold">Status</label>
-                        <select name="status" class="form-select">
+                        <select name="status" id="statusInput" class="form-select">
                             <option value="">Semua Status</option>
 
                             <?php foreach ($allowedStatus as $status): ?>
@@ -158,9 +356,10 @@ function build_reset_filter_url()
 
                     <div class="col-lg-2">
                         <label class="form-label fw-semibold">Tanggal Mulai</label>
-                        <input 
-                            type="date" 
-                            name="tanggal_mulai" 
+                        <input
+                            type="date"
+                            name="tanggal_mulai"
+                            id="tanggalMulaiInput"
                             class="form-control"
                             value="<?= e($tanggalMulai); ?>"
                         >
@@ -168,9 +367,10 @@ function build_reset_filter_url()
 
                     <div class="col-lg-2">
                         <label class="form-label fw-semibold">Tanggal Selesai</label>
-                        <input 
-                            type="date" 
-                            name="tanggal_selesai" 
+                        <input
+                            type="date"
+                            name="tanggal_selesai"
+                            id="tanggalSelesaiInput"
                             class="form-control"
                             value="<?= e($tanggalSelesai); ?>"
                         >
@@ -181,173 +381,160 @@ function build_reset_filter_url()
                             Filter
                         </button>
 
-                        <a href="<?= build_reset_filter_url(); ?>" class="btn btn-outline-secondary w-100">
+                        <button type="button" id="resetFilterBtn" class="btn btn-outline-secondary w-100">
                             Reset
-                        </a>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <p class="text-muted mb-0">
-                Menampilkan 
-                <strong><?= count($laporanList); ?></strong> 
-                dari 
-                <strong><?= $totalData; ?></strong> 
-                laporan
-            </p>
-
-            <p class="text-muted mb-0">
-                Halaman <strong><?= $page; ?></strong> dari <strong><?= $totalPages; ?></strong>
-            </p>
+        <div id="laporanLoader" class="ajax-loader d-none">
+            Memuat data laporan...
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <?php if (count($laporanList) === 0): ?>
-                    <div class="text-center p-5">
-                        <h5 class="fw-bold">Data Tidak Ditemukan</h5>
-                        <p class="text-muted mb-3">
-                            Tidak ada laporan yang cocok dengan filter yang dipilih.
-                        </p>
-
-                        <a href="<?= url('admin/laporan.php'); ?>" class="btn btn-primary">
-                            Tampilkan Semua Laporan
-                        </a>
-                    </div>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-modern align-middle">
-                            <thead>
-                                <tr>
-                                    <th style="width: 80px;">Foto</th>
-                                    <th>Pelapor</th>
-                                    <th>Laporan</th>
-                                    <th>Lokasi</th>
-                                    <th>Status</th>
-                                    <th>Tanggal</th>
-                                    <th class="text-end">Aksi</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                <?php foreach ($laporanList as $laporan): ?>
-                                    <tr>
-                                        <td>
-                                            <img 
-                                                src="<?= url('assets/uploads/laporan/' . $laporan['foto']); ?>" 
-                                                alt="Foto laporan"
-                                                class="table-thumb"
-                                            >
-                                        </td>
-
-                                        <td>
-                                            <strong><?= e($laporan['nama']); ?></strong><br>
-                                            <small class="text-muted"><?= e($laporan['email']); ?></small>
-                                        </td>
-
-                                        <td>
-                                            <strong><?= e($laporan['judul']); ?></strong><br>
-                                            <small class="text-muted">
-                                                <?= e(mb_strimwidth($laporan['deskripsi'], 0, 80, '...')); ?>
-                                            </small>
-                                        </td>
-
-                                        <td>
-                                            <small class="text-muted">
-                                                <?= e($laporan['alamat'] ?: 'Tanpa alamat tambahan'); ?><br>
-                                                <?= e($laporan['latitude']); ?>, <?= e($laporan['longitude']); ?>
-                                            </small>
-                                        </td>
-
-                                        <td>
-                                            <span class="<?= badge_status($laporan['status']); ?>">
-                                                <?= e(ucfirst($laporan['status'])); ?>
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <?= date('d M Y', strtotime($laporan['created_at'])); ?><br>
-                                            <small class="text-muted">
-                                                <?= date('H:i', strtotime($laporan['created_at'])); ?>
-                                            </small>
-                                        </td>
-
-                                        <td class="text-end">
-                                            <a 
-                                                href="<?= url('admin/detail-laporan.php?id=' . $laporan['id_laporan']); ?>" 
-                                                class="btn btn-outline-primary btn-sm"
-                                            >
-                                                Detail
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <?php if ($totalPages > 1): ?>
-                        <nav class="mt-4">
-                            <ul class="pagination justify-content-center mb-0">
-                                <li class="page-item <?= $page <= 1 ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="<?= build_admin_laporan_page_url($page - 1); ?>">
-                                        Sebelumnya
-                                    </a>
-                                </li>
-
-                                <?php
-                                $startPage = max(1, $page - 2);
-                                $endPage = min($totalPages, $page + 2);
-                                ?>
-
-                                <?php if ($startPage > 1): ?>
-                                    <li class="page-item">
-                                        <a class="page-link" href="<?= build_admin_laporan_page_url(1); ?>">1</a>
-                                    </li>
-
-                                    <?php if ($startPage > 2): ?>
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-
-                                <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-                                    <li class="page-item <?= $i === $page ? 'active' : ''; ?>">
-                                        <a class="page-link" href="<?= build_admin_laporan_page_url($i); ?>">
-                                            <?= $i; ?>
-                                        </a>
-                                    </li>
-                                <?php endfor; ?>
-
-                                <?php if ($endPage < $totalPages): ?>
-                                    <?php if ($endPage < $totalPages - 1): ?>
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                    <?php endif; ?>
-
-                                    <li class="page-item">
-                                        <a class="page-link" href="<?= build_admin_laporan_page_url($totalPages); ?>">
-                                            <?= $totalPages; ?>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
-
-                                <li class="page-item <?= $page >= $totalPages ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="<?= build_admin_laporan_page_url($page + 1); ?>">
-                                        Berikutnya
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
+        <div id="laporanContent" class="ajax-content">
+            <?= $contentHtml; ?>
         </div>
     </div>
 </section>
 
-<?php require_once __DIR__ . '/../layouts/footer.php'; ?>
+<?php
+
+$extraScripts = <<<HTML
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('filterLaporanForm');
+    const content = document.getElementById('laporanContent');
+    const loader = document.getElementById('laporanLoader');
+    const resetBtn = document.getElementById('resetFilterBtn');
+    const keywordInput = document.getElementById('keywordInput');
+
+    let searchTimer = null;
+
+    function cleanParams(params) {
+        for (const [key, value] of [...params.entries()]) {
+            if (String(value).trim() === '') {
+                params.delete(key);
+            }
+        }
+
+        return params;
+    }
+
+    function buildUrl(page = 1, ajax = false) {
+        const params = new URLSearchParams(new FormData(form));
+
+        cleanParams(params);
+
+        params.set('page', page);
+
+        if (ajax) {
+            params.set('ajax', '1');
+        }
+
+        const query = params.toString();
+
+        return window.location.pathname + (query ? '?' + query : '');
+    }
+
+    async function loadReports(page = 1, pushState = true) {
+        try {
+            loader.classList.remove('d-none');
+            content.classList.add('is-loading');
+
+            const ajaxUrl = buildUrl(page, true);
+            const cleanUrl = buildUrl(page, false);
+
+            const response = await fetch(ajaxUrl, {
+                headers: {
+                    'X-Requested-With': 'fetch'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Gagal mengambil data laporan.');
+            }
+
+            const html = await response.text();
+
+            content.innerHTML = html;
+
+            if (pushState) {
+                window.history.pushState({ page: page }, '', cleanUrl);
+            }
+        } catch (error) {
+            content.innerHTML = `
+                <div class="alert alert-danger">
+                    Gagal memuat data laporan. Silakan coba lagi.
+                </div>
+            `;
+        } finally {
+            loader.classList.add('d-none');
+            content.classList.remove('is-loading');
+        }
+    }
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        loadReports(1);
+    });
+
+    keywordInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+
+        searchTimer = setTimeout(function() {
+            loadReports(1);
+        }, 500);
+    });
+
+    ['statusInput', 'tanggalMulaiInput', 'tanggalSelesaiInput'].forEach(function(id) {
+        const input = document.getElementById(id);
+
+        input.addEventListener('change', function() {
+            loadReports(1);
+        });
+    });
+
+    resetBtn.addEventListener('click', function() {
+        form.reset();
+        loadReports(1);
+    });
+
+    document.addEventListener('click', function(event) {
+        const link = event.target.closest('.ajax-page-link');
+
+        if (!link) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const page = parseInt(link.dataset.page, 10);
+
+        if (!page || link.closest('.page-item').classList.contains('disabled')) {
+            return;
+        }
+
+        loadReports(page);
+    });
+
+    window.addEventListener('popstate', function() {
+        const params = new URLSearchParams(window.location.search);
+
+        form.keyword.value = params.get('keyword') || '';
+        form.status.value = params.get('status') || '';
+        form.tanggal_mulai.value = params.get('tanggal_mulai') || '';
+        form.tanggal_selesai.value = params.get('tanggal_selesai') || '';
+
+        const page = parseInt(params.get('page') || '1', 10);
+
+        loadReports(page, false);
+    });
+});
+</script>
+HTML;
+
+require_once __DIR__ . '/../layouts/footer.php';
+
+?>

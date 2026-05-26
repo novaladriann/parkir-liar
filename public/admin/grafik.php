@@ -228,81 +228,131 @@ function grafik_badge_status($status)
     </div>
 </section>
 
+<?php
+
+$extraScripts = '
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const statusLabels = ['Menunggu', 'Diverifikasi', 'Diproses', 'Selesai', 'Ditolak'];
-    const statusData = <?= json_encode(array_values($statusCounts)); ?>;
+document.addEventListener("DOMContentLoaded", function() {
+    const statusLabels = ["Menunggu", "Diverifikasi", "Diproses", "Selesai", "Ditolak"];
+    const statusData = ' . json_encode(array_values($statusCounts)) . ';
 
-    const monthlyLabels = <?= json_encode($monthlyLabels); ?>;
-    const monthlyData = <?= json_encode($monthlyTotals); ?>;
+    const monthlyLabels = ' . json_encode($monthlyLabels) . ';
+    const monthlyData = ' . json_encode($monthlyTotals) . ';
 
-    const statusCtx = document.getElementById('statusChart');
-    const monthlyCtx = document.getElementById('monthlyChart');
+    const statusCtx = document.getElementById("statusChart");
+    const monthlyCtx = document.getElementById("monthlyChart");
 
-    new Chart(statusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: statusLabels,
-            datasets: [{
-                data: statusData,
-                backgroundColor: [
-                    '#f59e0b',
-                    '#2563eb',
-                    '#7c3aed',
-                    '#16a34a',
-                    '#dc2626'
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom'
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: "doughnut",
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: [
+                        "#f59e0b",
+                        "#2563eb",
+                        "#7c3aed",
+                        "#16a34a",
+                        "#dc2626"
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 14
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "65%",
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 1300,
+                    easing: "easeOutQuart"
+                },
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            usePointStyle: true,
+                            padding: 18
+                        }
+                    },
+                    tooltip: {
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const value = context.raw;
+                                const percent = total > 0 ? Math.round((value / total) * 100) : 0;
+
+                                return " " + context.label + ": " + value + " laporan (" + percent + "%)";
+                            }
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 
-    new Chart(monthlyCtx, {
-        type: 'bar',
-        data: {
-            labels: monthlyLabels,
-            datasets: [{
-                label: 'Jumlah Laporan',
-                data: monthlyData,
-                backgroundColor: '#2563eb',
-                borderRadius: 10,
-                maxBarThickness: 48
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0
+    if (monthlyCtx) {
+        new Chart(monthlyCtx, {
+            type: "bar",
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: "Jumlah Laporan",
+                    data: monthlyData,
+                    backgroundColor: "#2563eb",
+                    borderRadius: 12,
+                    maxBarThickness: 48
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1200,
+                    easing: "easeOutBounce"
+                },
+                interaction: {
+                    mode: "index",
+                    intersect: false
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
                     }
                 },
-                x: {
-                    grid: {
+                plugins: {
+                    legend: {
                         display: false
+                    },
+                    tooltip: {
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return " Jumlah laporan: " + context.raw;
+                            }
+                        }
                     }
                 }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
             }
-        }
-    });
+        });
+    }
 });
 </script>
+';
 
-<?php require_once __DIR__ . '/../layouts/footer.php'; ?>
+require_once __DIR__ . '/../layouts/footer.php';
+
+?>
