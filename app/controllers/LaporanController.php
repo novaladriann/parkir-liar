@@ -121,7 +121,7 @@ class LaporanController
 
         $laporanModel = new Laporan($pdo);
 
-        $laporanModel->create([
+        $idLaporan = $laporanModel->create([
             'id_user' => $user['id_user'],
             'judul' => $judul,
             'deskripsi' => $deskripsi,
@@ -131,6 +131,14 @@ class LaporanController
             'alamat' => $alamat !== '' ? $alamat : null,
             'status' => 'menunggu'
         ]);
+
+        $laporanModel->addStatusLog(
+            $idLaporan,
+            null,
+            'menunggu',
+            'Laporan dikirim oleh masyarakat dan menunggu verifikasi admin.',
+            $user['id_user']
+        );
 
         set_flash('success', 'Laporan berhasil dikirim dan sedang menunggu verifikasi.');
         header('Location: ' . url('riwayat-laporan.php'));

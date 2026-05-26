@@ -21,6 +21,7 @@ if (!$idLaporan || !ctype_digit($idLaporan)) {
 
 $laporanModel = new Laporan($pdo);
 $laporan = $laporanModel->findByIdAndUser($idLaporan, $user['id_user']);
+$statusLogs = $laporanModel->getStatusLogs($idLaporan);
 
 if (!$laporan) {
     set_flash('error', 'Laporan tidak ditemukan.');
@@ -67,6 +68,45 @@ require_once __DIR__ . '/layouts/header.php';
                 <div class="card shadow-sm mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-3">Progress Laporan</h5>
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-3">Riwayat Progress</h5>
+
+                                <?php if (count($statusLogs) === 0): ?>
+                                    <div class="alert alert-info mb-0">
+                                        Belum ada riwayat progress.
+                                    </div>
+                                <?php else: ?>
+                                    <div class="status-timeline">
+                                        <?php foreach ($statusLogs as $log): ?>
+                                            <div class="timeline-item">
+                                                <div class="timeline-dot status-<?= e($log['status_sesudah']); ?>"></div>
+
+                                                <div class="timeline-content">
+                                                    <div class="d-flex justify-content-between gap-2">
+                                                        <strong><?= e(ucfirst($log['status_sesudah'])); ?></strong>
+
+                                                        <small class="text-muted">
+                                                            <?= date('d M Y H:i', strtotime($log['created_at'])); ?>
+                                                        </small>
+                                                    </div>
+
+                                                    <?php if ($log['catatan']): ?>
+                                                        <p class="mb-1">
+                                                            <?= nl2br(e($log['catatan'])); ?>
+                                                        </p>
+                                                    <?php endif; ?>
+
+                                                    <small class="text-muted">
+                                                        Diperbarui oleh <?= e($log['nama'] ?: 'Sistem'); ?>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
 
                         <?= render_status_stepper($laporan['status']); ?>
 

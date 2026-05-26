@@ -63,11 +63,26 @@ class AdminController
             exit;
         }
 
+        $statusSebelum = $laporan['status'];
+        $catatanSebelumnya = $laporan['catatan_admin'];
+
         $laporanModel->updateStatus(
             $idLaporan,
             $status,
             $catatanAdmin !== '' ? $catatanAdmin : null
         );
+
+        $user = current_user();
+
+        if ($statusSebelum !== $status || $catatanSebelumnya !== $catatanAdmin) {
+            $laporanModel->addStatusLog(
+                $idLaporan,
+                $statusSebelum,
+                $status,
+                $catatanAdmin !== '' ? $catatanAdmin : 'Status laporan diperbarui oleh admin.',
+                $user['id_user']
+            );
+        }
 
         set_flash('success', 'Status laporan berhasil diperbarui.');
         header('Location: ' . url('admin/detail-laporan.php?id=' . $idLaporan));

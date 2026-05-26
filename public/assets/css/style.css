@@ -753,3 +753,71 @@ body {
         transform: translateY(0);
     }
 }
+
+.status-timeline {
+    position: relative;
+    display: grid;
+    gap: 18px;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 14px;
+    position: relative;
+}
+
+.timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex: 0 0 16px;
+    margin-top: 4px;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 0 3px #e5e7eb;
+}
+
+.timeline-content {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 14px;
+    background: #ffffff;
+}
+
+.timeline-dot.status-menunggu {
+    background: #f59e0b;
+}
+
+.timeline-dot.status-diverifikasi {
+    background: #2563eb;
+}
+
+.timeline-dot.status-diproses {
+    background: #7c3aed;
+}
+
+.timeline-dot.status-selesai {
+    background: #16a34a;
+}
+
+.timeline-dot.status-ditolak {
+    background: #dc2626;
+}
+
+.preview-modal {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #f1f5f9;
+}
+
+.report-detail-image img {
+    cursor: zoom-in;
+}

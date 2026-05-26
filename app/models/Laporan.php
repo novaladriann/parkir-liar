@@ -285,4 +285,39 @@ class Laporan
 
         return (int) $stmt->fetch()['total'];
     }
+
+    public function addStatusLog($idLaporan, $statusSebelum, $statusSesudah, $catatan = null, $changedBy = null)
+    {
+        $query = "INSERT INTO laporan_status_logs 
+                (id_laporan, status_sebelum, status_sesudah, catatan, changed_by)
+              VALUES 
+                (:id_laporan, :status_sebelum, :status_sesudah, :catatan, :changed_by)";
+
+        $stmt = $this->pdo->prepare($query);
+
+        return $stmt->execute([
+            ':id_laporan' => $idLaporan,
+            ':status_sebelum' => $statusSebelum,
+            ':status_sesudah' => $statusSesudah,
+            ':catatan' => $catatan,
+            ':changed_by' => $changedBy
+        ]);
+    }
+
+    public function getStatusLogs($idLaporan)
+    {
+        $query = "SELECT laporan_status_logs.*, users.nama, users.role
+              FROM laporan_status_logs
+              LEFT JOIN users ON users.id_user = laporan_status_logs.changed_by
+              WHERE laporan_status_logs.id_laporan = :id_laporan
+              ORDER BY laporan_status_logs.created_at ASC";
+
+        $stmt = $this->pdo->prepare($query);
+
+        $stmt->execute([
+            ':id_laporan' => $idLaporan
+        ]);
+
+        return $stmt->fetchAll();
+    }
 }
