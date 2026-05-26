@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../../app/config/app.php';
 require_once __DIR__ . '/../../app/helpers/url.php';
 require_once __DIR__ . '/../../app/helpers/session.php';
+
+$user = current_user();
 ?>
 
 <!doctype html>
@@ -16,10 +18,10 @@ require_once __DIR__ . '/../../app/helpers/session.php';
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="<?= url('index.php'); ?>">
-            Parkir Liar
+        <a class="navbar-brand text-primary" href="<?= url('index.php'); ?>">
+            ParkirLiar
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
@@ -27,24 +29,38 @@ require_once __DIR__ . '/../../app/helpers/session.php';
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMenu">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                 <li class="nav-item">
                     <a class="nav-link" href="<?= url('index.php'); ?>">Beranda</a>
                 </li>
 
                 <?php if (is_logged_in()) : ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= url('dashboard.php'); ?>">Dashboard</a>
+                        <a class="nav-link" href="<?= $user['role'] === 'admin' ? url('admin/dashboard.php') : url('dashboard.php'); ?>">
+                            Dashboard
+                        </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= url('logout.php'); ?>">Logout</a>
+                        <span class="nav-link text-muted">
+                            <?= e($user['nama']); ?>
+                        </span>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="btn btn-outline-danger btn-sm px-3" href="<?= url('logout.php'); ?>">
+                            Logout
+                        </a>
                     </li>
                 <?php else : ?>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= url('login.php'); ?>">Login</a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= url('register.php'); ?>">Daftar</a>
+                        <a class="btn btn-primary btn-sm px-3" href="<?= url('register.php'); ?>">
+                            Daftar
+                        </a>
                     </li>
                 <?php endif; ?>
             </ul>
