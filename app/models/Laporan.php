@@ -320,4 +320,140 @@ class Laporan
 
         return $stmt->fetchAll();
     }
+
+    private function buildUserReportWhere(array $filters, array &$params)
+    {
+        $conditions = [
+            "id_user = :id_user"
+        ];
+
+        $params[':id_user'] = $filters['id_user'];
+
+        if (!empty($filters['status'])) {
+            $conditions[] = "status = :status";
+            $params[':status'] = $filters['status'];
+        }
+
+        if (!empty($filters['keyword'])) {
+            $keyword = '%' . $filters['keyword'] . '%';
+
+            $conditions[] = "(
+            judul LIKE :keyword_judul
+            OR deskripsi LIKE :keyword_deskripsi
+            OR alamat LIKE :keyword_alamat
+        )";
+
+            $params[':keyword_judul'] = $keyword;
+            $params[':keyword_deskripsi'] = $keyword;
+            $params[':keyword_alamat'] = $keyword;
+        }
+
+        if (!empty($filters['tanggal_mulai'])) {
+            $conditions[] = "created_at >= :tanggal_mulai";
+            $params[':tanggal_mulai'] = $filters['tanggal_mulai'] . ' 00:00:00';
+        }
+
+        if (!empty($filters['tanggal_selesai'])) {
+            $conditions[] = "created_at <= :tanggal_selesai";
+            $params[':tanggal_selesai'] = $filters['tanggal_selesai'] . ' 23:59:59';
+        }
+
+        return 'WHERE ' . implode(' AND ', $conditions);
+    }
+
+    public function searchUserReports(array $filters = [], $limit = 6, $offset = 0)
+    {
+        $params = [];
+        $where = $this->buildUserReportWhere($filters, $params);
+
+        $query = "SELECT *
+              FROM laporan
+              $where
+              ORDER BY created_at DESC
+              LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->pdo->prepare($query);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    public function countUserReports(array $filters = [])
+    {
+        $params = [];
+        $where = $this->buildUserReportWhere($filters, $params);
+
+        $query = "SELECT COUNT(*) AS total
+              FROM laporan
+              $where";
+
+        $stmt = $this->pdo->prepare($query);
+
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        $stmt->execute();
+
+        return (int) $stmt->fetch()['total'];
+    }
+
+    public function countByStatusForUser($idUser)
+    {
+        $query = "SELECT status, COUNT(*) AS total
+              FROM laporan
+              WHERE id_user = :id_user
+              GROUP BY status";
+
+        $stmt = $this->pdo->prepare($query);
+
+        $stmt->execute([
+            ':id_user' => $idUser
+        ]);
+
+        return $stmt->fetchAll();
+    }
+
+    public function findForUserMap($idUser, $status = null)
+    {
+        if ($status) {
+            $query = "SELECT id_laporan, judul, deskripsi, foto, latitude, longitude,
+                         alamat, status, created_at
+                  FROM laporan
+                  WHERE id_user = :id_user
+                  AND status = :status
+                  ORDER BY created_at DESC";
+
+            $stmt = $this->pdo->prepare($query);
+
+            $stmt->execute([
+                ':id_user' => $idUser,
+                ':status' => $status
+            ]);
+
+            return $stmt->fetchAll();
+        }
+
+        $query = "SELECT id_laporan, judul, deskripsi, foto, latitude, longitude,
+                     alamat, status, created_at
+              FROM laporan
+              WHERE id_user = :id_user
+              ORDER BY created_at DESC";
+
+        $stmt = $this->pdo->prepare($query);
+
+        $stmt->execute([
+            ':id_user' => $idUser
+        ]);
+
+        return $stmt->fetchAll();
+    }
 }

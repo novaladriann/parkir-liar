@@ -66,6 +66,12 @@ if ($user && $user['role'] === 'masyarakat') {
 
                             <li class="nav-item">
                                 <a class="nav-link" href="<?= url('riwayat-laporan.php'); ?>">Riwayat</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= url('peta-laporan.php'); ?>">Peta Saya</a>
+                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link position-relative" href="<?= url('notifikasi.php'); ?>">
                                     Notifikasi
@@ -76,7 +82,6 @@ if ($user && $user['role'] === 'masyarakat') {
                                         </span>
                                     <?php endif; ?>
                                 </a>
-                            </li>
                             </li>
                         <?php endif; ?>
 
@@ -93,7 +98,7 @@ if ($user && $user['role'] === 'masyarakat') {
                                 <a class="nav-link" href="<?= url('admin/grafik.php'); ?>">Grafik</a>
                             </li>
                         <?php endif; ?>
-                        
+
                         <li class="nav-item">
                             <a class="nav-link fw-semibold" href="<?= url('profil.php'); ?>">
                                 <?= e($user['nama']); ?>

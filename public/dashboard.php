@@ -137,15 +137,20 @@ $error = get_flash('error');
                         </div>
                     </div>
                 </div>
-
-                <div class="d-flex gap-2 mt-4">
+                <div class="d-flex gap-2 flex-wrap mt-4">
                     <a href="<?= url('buat-laporan.php'); ?>" class="btn btn-primary">
                         Buat Laporan
                     </a>
+
                     <a href="<?= url('riwayat-laporan.php'); ?>" class="btn btn-outline-primary">
                         Lihat Riwayat
                     </a>
+
+                    <a href="<?= url('peta-laporan.php'); ?>" class="btn btn-outline-primary">
+                        Peta Saya
+                    </a>
                 </div>
+                
             </div>
         </div>
     </div>

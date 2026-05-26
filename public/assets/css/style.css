@@ -1458,3 +1458,187 @@ body {
         height: 190px;
     }
 }
+
+.status-filter-card {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 16px;
+    text-align: left;
+    transition: 0.2s ease;
+}
+
+.status-filter-card span {
+    display: block;
+    color: var(--muted-color);
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.status-filter-card strong {
+    display: block;
+    color: var(--dark-color);
+    font-size: 24px;
+    line-height: 1;
+}
+
+.status-filter-card:hover,
+.status-filter-card.active {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    transform: translateY(-2px);
+}
+
+.status-filter-card.active strong {
+    color: var(--primary-color);
+}
+
+.modern-report-card {
+    overflow: hidden;
+    transition: 0.22s ease;
+}
+
+.modern-report-card:hover {
+    transform: translateY(-4px);
+    border-color: #bfdbfe;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08) !important;
+}
+
+.report-floating-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+}
+
+.report-image {
+    position: relative;
+}
+
+.report-location-box {
+    border: 1px solid var(--border-color);
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 14px;
+}
+
+.report-location-box span {
+    display: block;
+    color: var(--muted-color);
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.report-location-box strong {
+    display: block;
+    color: var(--dark-color);
+    margin-bottom: 4px;
+}
+
+.report-location-box small {
+    color: var(--muted-color);
+}
+
+.map-user-report {
+    width: 100%;
+    height: 620px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: #e5e7eb;
+}
+
+.map-status-card {
+    display: block;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 16px;
+    transition: 0.2s ease;
+}
+
+.map-status-card span {
+    display: block;
+    color: var(--muted-color);
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.map-status-card strong {
+    display: block;
+    color: var(--dark-color);
+    font-size: 24px;
+    line-height: 1;
+}
+
+.map-status-card:hover,
+.map-status-card.active {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    transform: translateY(-2px);
+}
+
+.map-status-card.active strong {
+    color: var(--primary-color);
+}
+
+.map-report-list-item {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    text-decoration: none;
+    color: var(--dark-color);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 14px;
+    background: #ffffff;
+    transition: 0.2s ease;
+}
+
+.map-report-list-item:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    transform: translateY(-2px);
+}
+
+.map-report-list-item img {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    object-fit: cover;
+    flex: 0 0 72px;
+    border: 1px solid var(--border-color);
+}
+
+.map-report-list-item strong,
+.map-report-list-item span,
+.map-report-list-item small {
+    display: block;
+}
+
+.map-report-list-item strong {
+    margin-bottom: 4px;
+}
+
+.map-report-list-item span {
+    color: var(--primary-color);
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+.map-report-list-item small {
+    color: var(--muted-color);
+}
+
+@media (max-width: 768px) {
+    .map-user-report {
+        height: 480px;
+    }
+
+    .map-report-list-item {
+        align-items: flex-start;
+    }
+}
