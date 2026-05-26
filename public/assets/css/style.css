@@ -171,3 +171,122 @@ body {
         display: block;
     }
 }
+
+.page-header {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gps-box {
+    background: var(--soft-primary);
+    border: 1px solid #bfdbfe;
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: center;
+}
+
+.guide-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.guide-item span {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 50%;
+    background: var(--soft-primary);
+    color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 800;
+}
+
+.guide-item p {
+    margin: 0;
+    color: var(--muted-color);
+}
+
+.report-card {
+    overflow: hidden;
+}
+
+.report-image {
+    height: 220px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.report-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.report-detail-image {
+    height: 420px;
+    background: #e5e7eb;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
+}
+
+.report-detail-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info-list {
+    display: grid;
+    gap: 14px;
+}
+
+.info-list div {
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-list div:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-list span {
+    display: block;
+    font-size: 13px;
+    color: var(--muted-color);
+    margin-bottom: 4px;
+}
+
+.info-list strong {
+    display: block;
+    color: var(--dark-color);
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+    .page-header,
+    .gps-box {
+        display: block;
+    }
+
+    .page-header .btn,
+    .gps-box .btn {
+        margin-top: 16px;
+        width: 100%;
+    }
+
+    .report-detail-image {
+        height: 260px;
+    }
+}

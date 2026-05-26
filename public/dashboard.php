@@ -56,12 +56,13 @@ $error = get_flash('error');
                 <p class="text-primary fw-semibold mb-1">Dashboard Masyarakat</p>
                 <h2 class="fw-bold mb-2">Halo, <?= e($user['nama']); ?></h2>
                 <p class="text-muted mb-0">
-                    Pantau laporan parkir liar yang sudah kamu kirim dan buat laporan baru dengan bukti foto serta lokasi GPS.
+                    Pantau laporan parkir liar yang sudah kamu kirim dan buat laporan baru dengan bukti foto serta
+                    lokasi GPS.
                 </p>
             </div>
 
             <div class="mt-3 mt-md-0">
-                <a href="#" class="btn btn-primary btn-lg">
+                <a href="<?= url('buat-laporan.php'); ?>" class="btn btn-primary btn-lg">
                     Buat Laporan
                 </a>
             </div>
@@ -137,8 +138,13 @@ $error = get_flash('error');
                     </div>
                 </div>
 
-                <div class="alert alert-info mt-4 mb-0">
-                    Fitur buat laporan dan riwayat laporan akan dibuat pada tahap berikutnya.
+                <div class="d-flex gap-2 mt-4">
+                    <a href="<?= url('buat-laporan.php'); ?>" class="btn btn-primary">
+                        Buat Laporan
+                    </a>
+                    <a href="<?= url('riwayat-laporan.php'); ?>" class="btn btn-outline-primary">
+                        Lihat Riwayat
+                    </a>
                 </div>
             </div>
         </div>
