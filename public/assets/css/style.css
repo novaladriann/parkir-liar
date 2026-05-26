@@ -367,3 +367,110 @@ body {
     border-right: 1px solid var(--border-color);
     border-radius: 0 16px 16px 0;
 }
+
+.map-admin {
+    width: 100%;
+    height: 620px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: #e5e7eb;
+}
+
+.map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.map-legend div {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.custom-map-marker {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+}
+
+.marker-menunggu {
+    background: #f59e0b;
+}
+
+.marker-diverifikasi {
+    background: #2563eb;
+}
+
+.marker-diproses {
+    background: #7c3aed;
+}
+
+.marker-selesai {
+    background: #16a34a;
+}
+
+.marker-ditolak {
+    background: #dc2626;
+}
+
+.map-popup {
+    width: 260px;
+}
+
+.map-popup img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.map-popup h6 {
+    font-weight: 800;
+    margin-top: 10px;
+    margin-bottom: 6px;
+}
+
+.map-popup-body {
+    padding: 2px;
+}
+
+@media (max-width: 768px) {
+    .map-admin {
+        height: 480px;
+    }
+}
+
+.chart-box {
+    position: relative;
+    height: 320px;
+}
+
+.chart-box-wide {
+    height: 320px;
+}
+
+@media (max-width: 768px) {
+    .chart-box,
+    .chart-box-wide {
+        height: 280px;
+    }
+}

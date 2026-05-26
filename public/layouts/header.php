@@ -61,6 +61,14 @@ $user = current_user();
                             <li class="nav-item">
                                 <a class="nav-link" href="<?= url('admin/laporan.php'); ?>">Kelola Laporan</a>
                             </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= url('admin/peta.php'); ?>">Peta</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= url('admin/grafik.php'); ?>">Grafik</a>
+                            </li>
                         <?php endif; ?>
 
                         <li class="nav-item">

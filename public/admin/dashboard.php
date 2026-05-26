@@ -106,7 +106,7 @@ $error = get_flash('error');
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Peta Pelanggaran</h5>
                         <p class="text-muted">Lihat titik lokasi parkir liar dari laporan valid.</p>
-                        <a href="#" class="btn btn-outline-primary">Buka</a>
+                        <a href="<?= url('admin/peta.php'); ?>" class="btn btn-outline-primary">Buka</a>
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@ $error = get_flash('error');
                     <div class="card-body p-4">
                         <h5 class="fw-bold">Grafik Pelaporan</h5>
                         <p class="text-muted">Pantau statistik laporan berdasarkan status dan waktu.</p>
-                        <a href="#" class="btn btn-outline-primary">Buka</a>
+                        <a href="<?= url('admin/grafik.php'); ?>" class="btn btn-outline-primary">Buka</a>
                     </div>
                 </div>
             </div>
